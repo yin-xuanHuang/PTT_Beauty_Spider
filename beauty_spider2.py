@@ -77,4 +77,4 @@ if __name__ == '__main__':
         count += 1
         print "已經下載: " + str(100 * count / total ) + " %."
 
-    print "下載完畢，滿滿的正妹圖已入袋拉！"
+    print "即將下載完畢，滿滿的正妹圖就要入袋拉！"
