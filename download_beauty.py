@@ -21,13 +21,9 @@ img_regex = re.compile(r'<img src="[^"]*(//[i|m].imgur.com/[^"]+jpg)" alt=')
 
 
 def download_pic(pic_url, dir):
-    # 增加處理重複下載的問題
     try:
         pic_name = dir + '/' + pic_url.split('/')[-1]
-        if os.path.exists(os.getcwd() + '/' + pic_name): 
-            print pic_name + ",已經下載過了喔 +_+"
-        else:
-            urllib.urlretrieve(pic_url, pic_name)
+        urllib.urlretrieve(pic_url, pic_name)
     except IOError as ioerr:
         print "IOError in download picture: " + pic_url
 
@@ -92,7 +88,6 @@ def store_pic(url, rate=""):
         count += 1
         p = multiprocessing.Process(target=download_pic, args=(pic_url, dir_name,))
         p.start()
-        p.join()
         # download_pic(pic_url, title)
 
     if count == 0:
