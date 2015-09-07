@@ -30,3 +30,5 @@ $ python beauty_spider2.py -1 100 100
 ```
 ![alt tag](http://i.imgur.com/xlkhW8B.png)
 
+# License
+MIT license
