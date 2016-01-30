@@ -1,34 +1,57 @@
-# PTT ±íÌØ°æÅÀÏxˆDÆ¬ÏÂİdÆ÷
-## Ç°ÑÔ
-ß@‚€ Program ÊÇ×ŒÎÒÓÃí¾šÁ•ÅÀÏxµÄ»ù±¾¸ÅÄî£¬´îÅä¶àˆÌĞĞ¾wµÄÊ¹ÓÃ <br>
-Ï£Íû´ó¼ÒÓĞ½¨×h»òÊÇÅúÔu¶¼¿ÉÒÔŒ‘ĞÅ½oÎÒ£¬Œ¦ÎÒíÕfß@ÊÇÓĞĞ§ÂÊµÄŒWÁ•™C•ş¡£
-µ«ÊÇ±Èİ^ƒAÏò×Ô¼º¸Ä code, ÖxÖx´ó¼ÒŒšÙFµÄÒâÒŠ! <br>
+# PTT è¡¨ç‰¹ç‰ˆçˆ¬èŸ²åœ–ç‰‡ä¸‹è¼‰å™¨
 
-## Ê¹ÓÃ·½·¨
+A crawler picture for web PTT Beauty
+
+## ç‰¹è‰²
+* æŠ“å–PTT æ–‡ç« å…§å®¹åœ–ç‰‡(åŒ…å«æ¨æ–‡)ï¼Œåªè¦é€£çµçš„çµå°¾æ˜¯åœ–ç‰‡æª”(.jpg .png) 
+
+## è¼¸å‡ºæ ¼å¼
+* è³‡æ–™å¤¾ç‚ºæ¨™é¡ŒåŠ ä¸Šæ¨æ–‡æ•¸ï¼Œè³‡æ–™å¤¾å…§ç‚ºåœ–ç‰‡
+   
+## ä½¿ç”¨æ–¹æ³•
+
+
+æ–¹æ³•ä¸€:
+
 ```
-$ python beauty_spider2.py ÅÀÏxÆğÊ¼µÄí“Ãæ ÅÀ×í“ ÍÆÎÄ¶àÉÙÒÔÉÏ 
+$ python beauty_spider2.py [çˆ¬èŸ²èµ·å§‹çš„é é¢] [çˆ¬å¹¾é ] [æ¨æ–‡å¤šå°‘ä»¥ä¸Š] 
 ```
-Èç¹ûÒªÄ×îĞÂí“Ãæé_Ê¼ÅÀ µÚÒ»‚€…¢”µÕˆÌî -1 <br>
-Ä¿Ç°¸÷·N bug Ğ§ÄÜÎ´ƒ»¯¡£<br>
-ÅÀÏxÊÇÀûÓÃ PTT ¾Wí“°æ£¬ËùÒÔí“ÃæÒÔ¾Wí“°æé˜ËœÊ¡£<br>
-Õˆ…¢¿¼£º <br>
+* [Demo Video](https://www.youtube.com/watch?v=jfvvUeuQPN4) - Windows
+* [Demo Video](https://www.youtube.com/watch?v=2nGdhs7TJKw) - Linux
+
+æ–¹æ³•äºŒ:
+
+```
+$ python download_beauty.py [è¼¸å…¥å…§å®¹]
+```
+* [Demo Video](https://www.youtube.com/watch?v=whxjScB1W4A) - Windows
+* [Demo Video](https://www.youtube.com/watch?v=DdZCf65wKsQ) - Linux
+
+å¦‚æœè¦å¾æœ€æ–°é é¢é–‹å§‹çˆ¬ ç¬¬ä¸€å€‹åƒæ•¸è«‹å¡« -1 <br>
+çˆ¬èŸ²æ˜¯åˆ©ç”¨ PTT ç¶²é ç‰ˆï¼Œæ‰€ä»¥é é¢ä»¥ç¶²é ç‰ˆç‚ºæ¨™æº–ã€‚<br>
+è«‹åƒè€ƒï¼š <br>
 ```
 https://www.ptt.cc/bbs/Beauty/index.html
 ```
 
-# ˆDÆ¬ÕfÃ÷
-## ÏÂİdÖĞ
-![alt tag](http://i.imgur.com/RoFrilx.jpg)<br>
-## ÏÂİdÍê³É
-![alt tag](http://i.imgur.com/tLwYbj2.png) <br>
-## ÙYÁÏŠAƒÈ²¿ î›r
-![alt tag](http://i.imgur.com/hu8MyIf.png) <br>
-## ˆÌĞĞ¹ Àı 
-Ê¹ÓÃ:
+###åŸ·è¡Œç’°å¢ƒ
+Python 2.7.3
+
+
+## åŸ·è¡Œç¯„ä¾‹ 
+ç¯„ä¾‹ä¸€:
 ``` 
-$ python beauty_spider2.py -1 100 100
+$ python beauty_spider2.py -1 5 10
 ```
-![alt tag](http://i.imgur.com/xlkhW8B.png)
+çˆ¬PTT è¡¨ç‰¹(beauty)ç‰ˆ 5é  æ–‡ç« å…§å®¹ï¼Œç„¶å¾Œåªä¸‹è¼‰æ¨æ–‡æ•¸>=10çš„æ–‡ç« 
+
+ç¯„ä¾‹äºŒ:
+``` 
+$ python download_beauty.py input.txt
+```
+çˆ¬ input.txt æª”æ¡ˆå…§çš„PTTæ–‡ç« é€£çµåœ–ç‰‡
+
 
 # License
 MIT license
+

@@ -1,80 +1,77 @@
 # -*- coding: utf-8 -*-
-
-
-import re
-import urllib2
+import requests
 import sys
 import download_beauty
+from bs4 import BeautifulSoup
+from time import time 
+from time import  strftime
+requests.packages.urllib3.disable_warnings()
 
 
-comment_regex = re.compile(u'class="nrec"><span class="hl (f\d)">(\w+)?')
-url_regex = re.compile(r'<a href="([^"]+)">')
-
-
-def reformalize(level):
-    if level is None:
-        return 100
-    elif level[0] == 'X':
-        return -10 * int(level[1])
-
-
-def getFirstPage():
-    content = urllib2.urlopen('https://www.ptt.cc/bbs/Beauty/index.html').read()
-    first_page = re.search(r'href="/bbs/Beauty/index(\d+).html">&lsaquo;', content).group(1)
-    return int(first_page)
-
+rs=requests.session()
+    
+def getPageNumber(content) :
+    startIndex = content.find('index')
+    endIndex = content.find('.html')
+    pageNumber = content[startIndex+5 : endIndex]
+    return pageNumber
 
 def crawPage(url, article_list, push_rate):
-    try:
-        source = urllib2.urlopen(url)
-        content = source.read()
-    except urllib2.URLError as urlerr:
-        print "URLError detected: " + url
-        return
+    res=rs.get(url,verify=False)
+    soup=BeautifulSoup(res.text,'html.parser')   
 
-    rent_lst = content.split('<div class="r-ent">')
+    for r_ent in soup.select('div.r-ent'):
+        try:
+            atag=r_ent.select('div.title')[0].find('a')
+            if(atag):
+                URL=atag['href']   
+                title=r_ent.select('div.title')[0].text.strip()
+                URL='https://www.ptt.cc'+URL
+                rate = r_ent.select('div.nrec')[0].text
+    
+                if(rate):       
+                   comment_rate = rate          
+                   if rate == u'爆':
+                     comment_rate = 100
+                   if rate[0] == 'X':
+                     comment_rate =  -1 * int(rate[1])          
+                else:
+                   comment_rate = 0
 
-    for each_data in rent_lst:
-        comment_rate = comment_regex.search(each_data)
-
-        if comment_rate:
-            try:
-                rate = int(comment_rate.group(2))
-            except Exception as err:
-                rate = reformalize(comment_rate.group(2))
-            if rate >= push_rate:
-                # parse each url
-                # get into new page, parse photo
-                try:
-                    url = 'https://www.ptt.cc/' + url_regex.search(each_data).group(1)
-                    article_list.append((rate, url))
-                    # print rate, url
-                except Exception as err:
-                    # print err
-                    pass
-
-
+                if int(comment_rate) >= push_rate:
+                   article_list.append((int(comment_rate), URL, title))		                            
+        except:
+            print 'error:',URL
+              
+   
 if __name__ == '__main__':
-
-    start_page, page_term, push_rate = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
+    start_page, page_term, push_rate = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]) 
+    ts = time() 
+    CrawlerTime= "BeautyPicture_"+strftime("%Y-%m-%d[%H-%M-%S]")
     if start_page < 0:
-        start_page = getFirstPage()
-    # print start_page, page_term, push_rate
+        res=rs.get('https://www.ptt.cc/bbs/Beauty/index.html',verify=False)
+        soup=BeautifulSoup(res.text,'html.parser')    
+        ALLpageURL = soup.select('.btn.wide')[1]['href']
+        ALLpage = start_page = int(getPageNumber(ALLpageURL))+1      
 
-    print "解析下載網頁面，統計數量中..."
+
+    print "Analytical download page..."
 
     article_list = []
     for page in range(start_page, start_page - page_term, -1):
         page_url = 'https://www.ptt.cc/bbs/Beauty/index' + str(page) + '.html'
         crawPage(page_url, article_list, push_rate)
 
-    print "即將開始下載圖片, 請再等一下下 ^_^"
-
     total = len(article_list)
     count = 0
-    for hot_rate, article in article_list:
-        download_beauty.store_pic(article, str(hot_rate))
+    for hot_rate, url, title in article_list:
+        download_beauty.store_pic(CrawlerTime, url, str(hot_rate),title)
         count += 1
-        print "已經下載: " + str(100 * count / total ) + " %."
+        print "download: " + str(100 * count / total ) + " %."
 
-    print "即將下載完畢，滿滿的正妹圖就要入袋拉！"
+    print "DONE"
+    print('Time {}s'.format(time() - ts)) 
+
+
+
+
