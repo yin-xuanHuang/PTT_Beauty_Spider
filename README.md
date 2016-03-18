@@ -1,18 +1,14 @@
 # PTT 表特版爬蟲圖片下載器
-
-A crawler picture for web PTT Beauty
+A crawler picture for web PTT Beauty 
 
 ## 特色
-* 抓取PTT 文章內容圖片(包含推文)，只要連結的結尾是圖片檔(.jpg .png) 
+* 抓取PTT 文章內容圖片(包含推文)
 
 ## 輸出格式
 * 資料夾為標題加上推文數，資料夾內為圖片
    
 ## 使用方法
-
-
 方法一:
-
 ```
 $ python beauty_spider2.py [爬蟲起始的頁面] [爬幾頁] [推文多少以上] 
 ```
@@ -20,7 +16,6 @@ $ python beauty_spider2.py [爬蟲起始的頁面] [爬幾頁] [推文多少以�
 * [Demo Video](https://www.youtube.com/watch?v=2nGdhs7TJKw) - Linux
 
 方法二:
-
 ```
 $ python download_beauty.py [輸入內容]
 ```
@@ -33,10 +28,6 @@ $ python download_beauty.py [輸入內容]
 ```
 https://www.ptt.cc/bbs/Beauty/index.html
 ```
-
-###執行環境
-Python 2.7.3
-
 
 ## 執行範例 
 範例一:
@@ -51,7 +42,9 @@ $ python download_beauty.py input.txt
 ```
 爬 input.txt 檔案內的PTT文章連結圖片
 
+## 執行環境
+* Python 2.7.3
 
-# License
+## License
 MIT license
 
