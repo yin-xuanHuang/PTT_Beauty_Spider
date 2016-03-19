@@ -13,16 +13,10 @@ A crawler picture for web PTT
 ```
 python beauty_spider2.py [板名] [爬蟲起始的頁面] [爬幾頁] [推文多少以上] 
 ```
-* [Demo Video](https://www.youtube.com/watch?v=jfvvUeuQPN4) - Windows
-* [Demo Video](https://www.youtube.com/watch?v=2nGdhs7TJKw) - Linux
-
 * 方法二(指定網址抓圖)
 ```
 python download_beauty.py [輸入內容.txt]
 ```
-* [Demo Video](https://www.youtube.com/watch?v=whxjScB1W4A) - Windows
-* [Demo Video](https://www.youtube.com/watch?v=DdZCf65wKsQ) - Linux
-
 如果要從最新頁面開始爬 第一個參數請填 -1 <br>
 爬蟲是利用 PTT 網頁版，所以頁面以網頁版為標準。<br>
 請參考： <br>
