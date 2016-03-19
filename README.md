@@ -1,7 +1,7 @@
 # PTT圖片下載器 (Python) For Windows and Linux 
 A crawler picture for web PTT 
 * [Demo Video](https://www.youtube.com/watch?v=YIFTQnE2wuk)  - Linux
-* [Demo Video](https://www.youtube.com/watch?v=hfTaLP3bc8U)  - Windows
+* [Demo Video](https://www.youtube.com/watch?v=aA4EDhxNRYo)  - Windows
 
 ## 特色
 * 抓取PTT 圖檔(包含推文)
