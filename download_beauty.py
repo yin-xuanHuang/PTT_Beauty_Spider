@@ -50,11 +50,10 @@ def store_pic(crawler_time, url, rate='', title=''):
     soup, _ = over18(url)
     crawler_time = url.split('/')[-2] + crawler_time
     # 避免有些文章會被使用者自行刪除標題列
-    if title:
-        try:
-            title = soup.select('.article-meta-value')[2].text
-        except Exception as e:
-            title = "no title"
+    try:
+        title = soup.select('.article-meta-value')[2].text
+    except Exception as e:
+        title = "no title"
     dir_name = remove(title, '\/:*?"<>|.') + "_" + rate
     pic_url_list = []
 
