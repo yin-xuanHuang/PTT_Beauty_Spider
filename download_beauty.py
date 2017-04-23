@@ -1,141 +1,136 @@
-# -*- coding: utf-8 -*-
-
 import os
 import sys
 import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import shutil
 import multiprocessing
-import time 
-from time import  strftime
+import time
+import datetime
 from bs4 import BeautifulSoup
 from functools import partial
-requests.packages.urllib3.disable_warnings()
 
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 rs = requests.session()
-#移除特殊字元（移除Windows上無法作為資料夾的字元）
+
+
+def over18(url):
+    res = rs.get(url, verify=False)
+    # 先檢查網址是否包含'over18'字串 ,如有則為18禁網站
+    if 'over18' in res.url:
+        print("18禁網頁")
+        # 從網址獲得版名
+        board = url.split('/')[-2]
+        load = {
+            'from': '/bbs/{}/index.html'.format(board),
+            'yes': 'yes'
+        }
+        res = rs.post('https://www.ptt.cc/ask/over18', verify=False, data=load)
+    return BeautifulSoup(res.text, 'html.parser'), res.status_code
+
+
+# 移除特殊字元（移除Windows上無法作為資料夾的字元）
 def remove(value, deletechars):
     for c in deletechars:
-        value = value.replace(c,'')
-    return value.rstrip();
+        value = value.replace(c, '')
+    return value.rstrip()
 
-#符合圖片格式的網址
-def isImageFormat(link):
-    if(link.find('.jpg') > -1 or link.find('.png') > -1 or link.find('.gif') > -1 or link.find('.jpeg') > -1):
-       return True;
-    return False;
 
-def store_pic(CrawlerTime, url, rate="", title="" ):
-    #檢查看板是否為18禁,有些看板為18禁
-    soup = over18(url)  
-    CrawlerTime = url.split('/')[-2] + CrawlerTime
-    #避免有些文章會被使用者自行刪除標題列  
-    if(title == ""):
-       try:
-          title = soup.select('.article-meta-value')[2].text
-       except:
-          title = "no title"
-    
-    dir_name = remove(title, '\/:*?"<>|.') + "_"+ rate 
+# 符合圖片格式的網址
+def is_image_format(link):
+    link = link.lower()
+    image_seq = ['.jpg', '.png', '.gif', '.jpeg']
+    for seq in image_seq:
+        if link.endswith(seq):
+            return True
+    return False
+
+
+def store_pic(crawler_time, url, rate='', title=''):
+    # 檢查看板是否為18禁,有些看板為18禁
+    soup, _ = over18(url)
+    crawler_time = url.split('/')[-2] + crawler_time
+    # 避免有些文章會被使用者自行刪除標題列
+    if title:
+        try:
+            title = soup.select('.article-meta-value')[2].text
+        except ImportError:
+            title = "no title"
+    dir_name = remove(title, '\/:*?"<>|.') + "_" + rate
     pic_url_list = []
 
-    #抓取圖片URL(img tag )
-    for img in soup.select('img'):
-        if ( isImageFormat(img['src']) ):
-            if (img['src'].find('http') == -1 ):
-               link = 'http:'+ img['src'] 
-            else:
-               link = img['src']    
-            pic_url_list.append(link)
+    # 抓取圖片URL(img tag )
+    for img in soup.find_all("a", rel='nofollow'):
+        if is_image_format(img['href']):
+            pic_url_list.append(img['href'])
 
-    #開始建立資料夾,使用文章標題做為資料夾的名稱
-    if( len(pic_url_list) != 0):
-        relative_path = os.path.join(CrawlerTime,dir_name)
-        path = os.path.abspath(relative_path) 
-        try:    
-           if not os.path.exists(path):                    
-              os.makedirs(path)              
-        except Exception, e: 
-           print u'os.makedirs(path) error'  
-  
-        pool_size = multiprocessing.cpu_count() * 2        
-        download = partial(download_link, relative_path)      
-        pool = multiprocessing.Pool(processes = pool_size, 
+    # 開始建立資料夾,使用文章標題做為資料夾的名稱
+    if pic_url_list:
+        relative_path = os.path.join(crawler_time, dir_name)
+        path = os.path.abspath(relative_path)
+        try:
+            if not os.path.exists(path):
+                os.makedirs(path)
+        except ImportError:
+            print('os.makedirs(path) error')
 
-        ) 
-        
-        pool_outputs = pool.map(download, pic_url_list) 
-        pool.close() 
-        pool.join() 
- 
-def download_link(directory, link): 
-    resImg = rs.get(link, stream = True,verify = False) 
-    #使用網址的最後一個字串設為圖片檔案名稱 
-    filename = link.split('/')[-1]              
-    relative_path = os.path.join(directory,filename)
+        pool_size = multiprocessing.cpu_count() * 2
+        download = partial(download_link, relative_path)
+        pool = multiprocessing.Pool(processes=pool_size, )
+        pool.map(download, pic_url_list)
+        pool.close()
+        pool.join()
+
+
+def download_link(directory, link):
+    res_img = rs.get(link, stream=True, verify=False)
+    # 使用網址的最後一個字串設為圖片檔案名稱
+    filename = link.split('/')[-1]
+    relative_path = os.path.join(directory, filename)
     path = os.path.abspath(relative_path)
-    try:   
-        if not os.path.exists(path): 
-           with open(path, 'wb') as out_file: 
-                shutil.copyfileobj(resImg.raw, out_file) 
-           del resImg         
-    except Exception, e: 
-        print u'shutil.copyfileobj error'     
-   
-def over18(url):
-    res = rs.get(url, verify = False)
-    #先檢查網址是否包含'over18'字串 ,如有則為18禁網站
-    if ( res.url.find('over18') > -1 ):
-       print u"18禁網頁"
-       #從網址獲得版名
-       Board = url.split('/')[-2]
-       load = {
-           'from':'/bbs/'+Board+'/index.html',
-           'yes':'yes' 
-       }
-       res = rs.post('https://www.ptt.cc/ask/over18',verify = False, data = load)
-       return  BeautifulSoup(res.text,'html.parser')  
-    return BeautifulSoup(res.text,'html.parser')  
-        
+    try:
+        if not os.path.exists(path):
+            with open(path, 'wb') as out_file:
+                shutil.copyfileobj(res_img.raw, out_file)
+            del res_img
+    except ImportError:
+        print('shutil.copyfileobj error')
+
+
 def main():
-    print u"Analytical download page..."
-    CrawlerTime = "_PttImg_"+strftime("%Y%m%d%H%M%S")
+    print("Analytical download page...")
+    datetime_format = '%Y%m%d%H%M%S'
+    crawler_time = '_PttImg_{:{}}'.format(datetime.datetime.now(), datetime_format)
     start_time = time.time()
     beauty_article_urls = []
     # 從.txt檔案中讀取 urls
     total = 0
     with open(sys.argv[1]) as fd:
         for url in fd:
-            if( url.strip().find("www.ptt.cc") > -1 ):
-               beauty_article_urls.append(url.strip())
-               total += 1
-            
+            if 'www.ptt.cc' in url.strip():
+                beauty_article_urls.append(url.strip())
+                total += 1
+
     count = 0
-    while beauty_article_urls :
-          URL = beauty_article_urls.pop(0)
-          #檢查看板是否為18禁,有些看板為18禁
-          soup = over18(URL)
-          #如網頁忙線中,則先將網頁加入 index_list 並休息1秒後再連接
-          if (soup.title.text.find('Service Temporarily') > -1) :
-              beauty_article_urls.append(URL);
-              #print u'error_URL:',URL
-              time.sleep(1)
-          else : 
-              #print u'OK_URL:', URL 
-              # 下載該網頁的圖片
-              count += 1       
-              store_pic(CrawlerTime, URL)
-              print u"Crawling: " + str(100 * count / total ) + " %."
-          time.sleep(0.05)
-          
-    print u"下載完畢..."
-    print u"execution time:" + str(time.time() - start_time)+"s"
+    while beauty_article_urls:
+        url = beauty_article_urls.pop(0)
+        # 檢查看板是否為18禁,有些看板為18禁
+        _, status_code = over18(url)
+        # 如網頁忙線中,則先將網頁加入 index_list 並休息1秒後再連接
+        if status_code != 200:
+            beauty_article_urls.append(url)
+            # print('error_URL:',URL)
+            time.sleep(1)
+        else:
+            # print('OK_URL:', URL)
+            # 下載該網頁的圖片
+            count += 1
+            store_pic(crawler_time, url)
+            print('Crawling: {:.2%}'.format(count / total))
+        time.sleep(0.05)
+
+    print('下載完畢...')
+    print('execution time: {:.3}s'.format(time.time() - start_time))
+
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-    
