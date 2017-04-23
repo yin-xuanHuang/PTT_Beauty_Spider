@@ -54,7 +54,7 @@ def craw_page(res, push_rate):
                         'url': url,
                         'rate': rate,
                     })
-        except ImportError:
+        except Exception as e:
             # print('crawPage function error:',r_ent.find(class_="title").text.strip())
             print('本文已被刪除')
     return article_seq
@@ -62,7 +62,8 @@ def craw_page(res, push_rate):
 
 def main():
     # python beauty_spider2.py [版名] [爬蟲起始的頁面] [爬幾頁] [推文多少以上]
-    board, start_page, page_term, push_rate = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])
+    # board, start_page, page_term, push_rate = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])
+    board, start_page, page_term, push_rate = 'beauty', -1, 3, 10
     start_time = time.time()
     datetime_format = '%Y%m%d%H%M%S'
     crawler_time = '_PttImg_{:{}}'.format(datetime.datetime.now(), datetime_format)

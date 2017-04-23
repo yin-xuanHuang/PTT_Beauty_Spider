@@ -53,7 +53,7 @@ def store_pic(crawler_time, url, rate='', title=''):
     if title:
         try:
             title = soup.select('.article-meta-value')[2].text
-        except ImportError:
+        except Exception as e:
             title = "no title"
     dir_name = remove(title, '\/:*?"<>|.') + "_" + rate
     pic_url_list = []
@@ -70,7 +70,7 @@ def store_pic(crawler_time, url, rate='', title=''):
         try:
             if not os.path.exists(path):
                 os.makedirs(path)
-        except ImportError:
+        except Exception as e:
             print('os.makedirs(path) error')
 
         pool_size = multiprocessing.cpu_count() * 2
@@ -92,7 +92,7 @@ def download_link(directory, link):
             with open(path, 'wb') as out_file:
                 shutil.copyfileobj(res_img.raw, out_file)
             del res_img
-    except ImportError:
+    except Exception as e:
         print('shutil.copyfileobj error')
 
 
