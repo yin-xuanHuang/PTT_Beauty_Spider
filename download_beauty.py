@@ -54,7 +54,8 @@ def store_pic(crawler_time, url, rate='', title=''):
         title = soup.select('.article-meta-value')[2].text
     except Exception as e:
         title = "no title"
-    dir_name = remove(title, '\/:*?"<>|.') + "_" + rate
+
+    dir_name = '{}_{}'.format(remove(title, '\/:*?"<>|.'), rate)
     pic_url_list = []
 
     # 抓取圖片URL(img tag )

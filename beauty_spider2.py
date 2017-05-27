@@ -1,10 +1,12 @@
-import download_beauty
-import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+import datetime
 import sys
 import time
-import datetime
+
+import requests
 from bs4 import BeautifulSoup
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+import download_beauty
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 rs = requests.session()
@@ -40,11 +42,15 @@ def craw_page(res, push_rate):
             if link:
                 # 確定得到url再去抓 標題 以及 推文數
                 title = r_ent.find(class_="title").text.strip()
-                rate = r_ent.find(class_="nrec").text
+                rate_text = r_ent.find(class_="nrec").text
                 url = 'https://www.ptt.cc' + link
-                if rate:
-                    rate = 100 if rate.startswith('爆') else rate
-                    rate = -1 * int(rate[1]) if rate.startswith('X') else rate
+                if rate_text:
+                    if rate_text.startswith('爆'):
+                        rate = 100
+                    elif rate_text.startswith('X'):
+                        rate = -1 * int(rate_text[1])
+                    else:
+                        rate = rate_text
                 else:
                     rate = 0
                 # 比對推文數
@@ -55,14 +61,14 @@ def craw_page(res, push_rate):
                         'rate': rate,
                     })
         except Exception as e:
-            # print('crawPage function error:',r_ent.find(class_="title").text.strip())
-            print('本文已被刪除')
+            print('本文已被刪除', e)
     return article_seq
 
 
 def main():
-    # python beauty_spider2.py [版名] [爬蟲起始的頁面] [爬幾頁] [推文多少以上]
-    board, start_page, page_term, push_rate = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])
+    # python beauty_spider2.py [版名] [爬蟲起始的頁面] [爬幾頁] [推文多少以上] python beauty_spider2.py beauty -1 3 10
+    # board, start_page, page_term, push_rate = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])
+    board, start_page, page_term, push_rate = 'beauty', -1, 3, 10
     start_time = time.time()
     datetime_format = '%Y%m%d%H%M%S'
     crawler_time = '_PttImg_{:{}}'.format(datetime.datetime.now(), datetime_format)
@@ -90,12 +96,9 @@ def main():
         # 如網頁忙線中,則先將網頁加入 index_list 並休息1秒後再連接
         if res.status_code != 200:
             index_list.append(index)
-            # print('error_url:',index)
             time.sleep(1)
         else:
-            # soup = BeautifulSoup(res.text, 'html.parser')
-            article_list = craw_page(res, push_rate)
-            # print('ok_url:', index)
+            article_list += craw_page(res, push_rate)
         time.sleep(0.05)
 
     total = len(article_list)
@@ -107,12 +110,9 @@ def main():
         # 如網頁忙線中,則先將網頁加入 index_list 並休息1秒後再連接
         if res.status_code != 200:
             article_list.append(article)
-            # print('error_URL:',article[1])
             time.sleep(1)
         else:
-            # soup = BeautifulSoup(res.text, 'html.parser')
             count += 1
-            # print('OK_URL:', article.url)
             download_beauty.store_pic(crawler_time, article['url'], article['rate'], article['title'])
             print('download: {:.2%}'.format(count / total))
         time.sleep(0.05)
