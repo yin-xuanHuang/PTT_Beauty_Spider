@@ -35,14 +35,16 @@ def remove(value, deletechars):
     return value.rstrip()
 
 
-# 符合圖片格式的網址
-def is_image_format(link):
-    link = link.lower()
+def image_url(link):
+    # 符合圖片格式的網址
     image_seq = ['.jpg', '.png', '.gif', '.jpeg']
     for seq in image_seq:
         if link.endswith(seq):
-            return True
-    return False
+            return link
+    # 有些網址會沒有檔案格式， "https://imgur.com/xxx"
+    if 'imgur' in link:
+        return '{}.jpg'.format(link)
+    return ''
 
 
 def store_pic(crawler_time, url, rate='', title=''):
@@ -60,8 +62,9 @@ def store_pic(crawler_time, url, rate='', title=''):
 
     # 抓取圖片URL(img tag )
     for img in soup.find_all("a", rel='nofollow'):
-        if is_image_format(img['href']):
-            pic_url_list.append(img['href'])
+        img_url = image_url(img['href'])
+        if img_url:
+            pic_url_list.append(img_url)
 
     # 開始建立資料夾,使用文章標題做為資料夾的名稱
     if pic_url_list:
